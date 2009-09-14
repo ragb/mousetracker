@@ -17,7 +17,7 @@ import gst
 class MouseSoundTracker(object):
     """ Mouse locator class to locate the mouse using sound """
 
-    def __init__(self):
+    def __init__(self, volume=1.0, min_freq=200, max_freq=1000):
         self._running = False
         
         # construct pipeline
@@ -33,6 +33,20 @@ class MouseSoundTracker(object):
         bus = self._player.get_bus()
         bus.add_signal_watch()
         bus.connect("message", self._onMessage)
+
+        self.volume = volume
+
+        # properties
+        self.min_freq = min_freq
+        self.max_freq = max_freq
+
+    def _get_volume(self):
+        return self._source.get_property("volume")
+
+    def _set_volume(self, volume):
+        self._source.set_property("volume", volume)
+
+    volume = property(_get_volume, _set_volume)
 
     def run(self):
         if self._running:
@@ -54,7 +68,7 @@ class MouseSoundTracker(object):
     def _calculateSoundParametersFromMousePosition(self, x, y):
         screen = gtk.gdk.screen_get_default()
         pan = 2 * (float(x) / screen.get_width())  -1
-        freq = 200 + (screen.get_height() - y) * 1000 / screen.get_height()
+        freq = self.min_freq + (screen.get_height() - y) * (self.max_freq - self.min_freq) / screen.get_height()
         return (freq, pan)
 
     def _beep(self, frequency, panorama):
@@ -86,7 +100,7 @@ class Application(object):
         signal.signal(signal.SIGINT, lambda signum, stackframe : self.quit())
 
         # startup sound tracker
-        self._trcker = MouseSoundTracker()
+        self._tracker = MouseSoundTracker()
         self._tracker.run()
         pyatspi.Registry.start()
 
