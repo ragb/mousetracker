@@ -12,13 +12,22 @@ import pygst
 pygst.require("0.10")
 import gst
 
+import gobject
 import pyatspi
 
+class MouseTracker(gobject.GObject):
 
-class MousePositionTracker(object):
+    def __init__(self, **kwargs):
+        gobject.GObject.__init__(self, **kwargs)
+
+    def onMouseMove(self, x, y):
+        raise NotImplementedError
+
+class MousePositionTracker(MouseTracker):
     """ Mouse locator class to locate the mouse using sound """
 
-    def __init__(self, volume=1.0, min_freq=200, max_freq=1000):
+    def __init__(self, **kwargs):
+        MouseTracker.__init__(self, **kwargs)
         self._running = False
         
         # construct pipeline
@@ -35,19 +44,37 @@ class MousePositionTracker(object):
         bus.add_signal_watch()
         bus.connect("message", self._onMessage)
 
-        self.volume = volume
-
-        # properties
-        self.min_freq = min_freq
-        self.max_freq = max_freq
-
     def _get_volume(self):
         return self._source.get_property("volume")
 
     def _set_volume(self, volume):
         self._source.set_property("volume", volume)
 
-    volume = property(_get_volume, _set_volume)
+    volume = gobject.property(
+        type=float,
+        nick='volume',
+        default=1.0,
+        minimum=0.0,
+        maximum=1.0,
+        getter=_get_volume,
+        setter=_set_volume
+        )
+
+    max_freq = gobject.property(
+        type=int,
+        nick='max_freq',
+        default=1500,
+        minimum=600,
+        maximum=2000
+        )
+
+    min_freq = gobject.property(
+        type=int,
+        nick='min_freq',
+        default=200,
+        minimum=20,
+        maximum=500
+        )
 
     def run(self):
         if self._running:
