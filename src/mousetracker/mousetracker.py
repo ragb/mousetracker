@@ -14,7 +14,7 @@ import gst
 
 
 
-class MouseSoundLocator(object):
+class MouseSoundTracker(object):
     """ Mouse locator class to locate the mouse using sound """
 
     def __init__(self):
@@ -85,13 +85,13 @@ class Application(object):
         import signal
         signal.signal(signal.SIGINT, lambda signum, stackframe : self.quit())
 
-        # startup sound locator
-        self._locator = MouseSoundLocator()
-        self._locator.run()
+        # startup sound tracker
+        self._trcker = MouseSoundTracker()
+        self._tracker.run()
         pyatspi.Registry.start()
 
     def quit(self):
-        self._locator.stop()
+        self._tracker.stop()
         pyatspi.Registry.stop()
 
 if __name__ == '__main__':
