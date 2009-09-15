@@ -1,1 +1,1 @@
-SUBDIRS = mouselocator
+SUBDIRS = mousetracker

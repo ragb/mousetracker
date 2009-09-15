@@ -1,1 +1,6 @@
-python_PYTHON = mouselocator.py __init__.py
+python_PYTHON = __init__.py \
+mousetracker.py \
+settings.py \
+tracker.py
+
+bin_SCRIPTS = mousetracker

@@ -23,6 +23,12 @@ class MouseTracker(gobject.GObject):
     def onMouseMove(self, x, y):
         raise NotImplementedError
 
+    def getPropertiesAsDict(self):
+        dict = {}
+        for prop in self.props:
+            dict[prop.name] = self.get_property(prop.name)
+        return dict
+
 class MousePositionTracker(MouseTracker):
     """ Mouse locator class to locate the mouse using sound """
 
@@ -53,7 +59,7 @@ class MousePositionTracker(MouseTracker):
     volume = gobject.property(
         type=float,
         nick='volume',
-        default=1.0,
+        default=0.5,
         minimum=0.0,
         maximum=1.0,
         getter=_get_volume,

@@ -33,4 +33,5 @@ AC_OUTPUT([
 Makefile
 src/Makefile
 src/mousetracker/Makefile
+src/mousetracker/mousetracker
 ])
