@@ -1,7 +1,7 @@
 python_PYTHON = __init__.py \
 mousetracker.py \
 settings.py \
-tracker.py
+trackers.py
 
 bin_SCRIPTS = mousetracker
 
