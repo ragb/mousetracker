@@ -1,0 +1,19 @@
+= MouseTracker =
+
+== Features ==
+
+* Tracks mouse using sound (pan for x coordenate, frequency for y coordenate)
+* Writen in python
+* Uses gstreamer for sound output
+* uses gtk, gdk and pyatspi for capturing mouse events
+* Stores preferences in json format
+
+
+== requirements ==
+
+* pygtk 2.0
+* python gstreamer bindings (pygst) 0.10
+* pyatspi
+* python >= 2.4 and simplejson module or python >= 2.6
+
+
