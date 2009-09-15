@@ -4,3 +4,5 @@ settings.py \
 tracker.py
 
 bin_SCRIPTS = mousetracker
+
+DISTCLEANFILES = mousetracker
