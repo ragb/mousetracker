@@ -15,19 +15,49 @@ import gst
 import gobject
 import pyatspi
 
-class MouseTracker(gobject.GObject):
+import dbus
+import dbus.service
+import dbus.gobject_service
+
+class MouseTracker(dbus.gobject_service.ExportedGObject):
 
     def __init__(self, **kwargs):
-        gobject.GObject.__init__(self, **kwargs)
+        dbus.gobject_service.ExportedGObject.__init__(self, **kwargs)
+        self.connect("notify", self._onPropertyChanged)
 
     def onMouseMove(self, x, y):
         raise NotImplementedError
 
-    def getPropertiesAsDict(self):
+    @dbus.service.method("org.freedesktop.dbus.properties",
+in_signature="",
+out_signature="{sv}")
+    def getAllProperties(self):
         dict = {}
         for prop in self.props:
             dict[prop.name] = self.get_property(prop.name)
         return dict
+
+    @dbus.service.method("org.freedesktop.dbus.properties",
+in_signature="s",
+out_signature="v")
+    def get(self, name):
+        return self.get_property(name)
+
+    @dbus.service.method("org.freedesktop.dbus.properties",
+    in_signature="sv",
+    out_signature="")
+    def set(self, property, value):
+        self.set_property(property, value)
+
+    def _onPropertyChanged(self, spec, userdata=None):
+        name = spec.name
+        value = self.get_property(name)
+        self.propertyChanged(name, value)
+
+    @dbus.service.signal("mousetracker.tracker",
+    signature="sv")
+    def propertyChanged(self, name, value):
+        return (name, value)
 
 class MousePositionTracker(MouseTracker):
     """ Mouse locator class to locate the mouse using sound """
