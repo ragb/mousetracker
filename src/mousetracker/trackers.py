@@ -19,10 +19,16 @@ import dbus
 import dbus.service
 import dbus.gobject_service
 
+
+class TrackerPropertyException(dbus.DBusException):
+    _dbus_error_name="mousetracker.tracker.TrackerPropertyException"
+
 class MouseTracker(dbus.gobject_service.ExportedGObject):
 
     def __init__(self, **kwargs):
-        dbus.gobject_service.ExportedGObject.__init__(self, **kwargs)
+        from mousetracker import BUS_NAME
+        dbus.gobject_service.ExportedGObject.__init__(self, conn=dbus.SessionBus(),
+            bus_name=dbus.service.BusName(BUS_NAME, bus=dbus.SessionBus()), **kwargs)
         self.connect("notify", self._onPropertyChanged)
 
     def onMouseMove(self, x, y):
@@ -41,13 +47,19 @@ out_signature="{sv}")
 in_signature="s",
 out_signature="v")
     def get(self, name):
-        return self.get_property(name)
+        try:
+            return self.get_property(name)
+        except TypeError, e:
+            raise TrackerPropertyError(e.message)
 
     @dbus.service.method("org.freedesktop.dbus.properties",
     in_signature="sv",
     out_signature="")
     def set(self, property, value):
-        self.set_property(property, value)
+        try:
+            self.set_property(property, value)
+        except TypeError, e:
+            raise TrackerPropertyError(e.message)
 
     def _onPropertyChanged(self, spec, userdata=None):
         name = spec.name
@@ -61,9 +73,10 @@ out_signature="v")
 
 class MousePositionTracker(MouseTracker):
     """ Mouse locator class to locate the mouse using sound """
+    _object_path = "/mousetracker/tracker/MousePositionTracker"
 
     def __init__(self, **kwargs):
-        MouseTracker.__init__(self, **kwargs)
+        MouseTracker.__init__(self, object_path=MousePositionTracker._object_path, **kwargs)
         self._running = False
         
         # construct pipeline

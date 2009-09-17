@@ -7,9 +7,17 @@ import gobject
 import gtk
 import pyatspi
 
+import dbus
+import dbus.service
+import dbus.mainloop
+import dbus.glib
+
 from trackers import MousePositionTracker
 
 import settings
+
+BUS_NAME = "mousetracker.daemon"
+dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
 class Application(object):
 
@@ -21,6 +29,9 @@ class Application(object):
         # setup signal handlers
         import signal
         signal.signal(signal.SIGINT, lambda signum, stackframe : self.quit())
+
+        # store reference to bus
+        self._bus = dbus.service.BusName(BUS_NAME, bus=dbus.SessionBus())
 
         # startup sound tracker
         kwargs = {}
