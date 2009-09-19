@@ -10,7 +10,7 @@ dnl == check for python ==
 AM_PATH_PYTHON(2.4)
 
 dnl == check for gstreamer ==
-PKG_CHECK_MODULES(MOUSETRACKER, gstreamer-0.10 gst-python-0.10 dbus-python)
+#PKG_CHECK_MODULES(MOUSETRACKER, gstreamer-0.10 gst-python-0.10 dbus-python)
 
 
 #dnl == i18n ==
@@ -28,4 +28,5 @@ Makefile
 src/Makefile
 src/mousetracker/Makefile
 src/mousetracker/mousetracker
+src/mousetracker/_constants.py
 ])

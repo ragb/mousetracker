@@ -19,7 +19,7 @@ import settings
 BUS_NAME = "mousetracker.daemon"
 dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
-class Application(object):
+class Daemon(object):
 
     def __init__(self):
         pass
@@ -45,9 +45,9 @@ class Application(object):
         self._tracker.stop()
         pyatspi.Registry.stop()
         
-        self._settings['positionTracker'] = self._tracker.getPropertiesAsDict()
+        self._settings['positionTracker'] = self._tracker.getAll()
         self._settings.flush()
 
 if __name__ == '__main__':
     import sys
-    Application().main(sys.argv)
+    Daemon().main(sys.argv)

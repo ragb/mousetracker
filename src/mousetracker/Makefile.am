@@ -5,4 +5,4 @@ trackers.py
 
 bin_SCRIPTS = mousetracker
 
-DISTCLEANFILES = mousetracker
+DISTCLEANFILES = mousetracker _constants.py
