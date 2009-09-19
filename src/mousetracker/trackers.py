@@ -25,6 +25,7 @@ class TrackerPropertyException(dbus.DBusException):
 
 class MouseTracker(dbus.gobject_service.ExportedGObject):
 
+    PROPERTIES_IFACE = "mousetracker.Tracker.Properties"
     def __init__(self, **kwargs):
         from mousetracker import BUS_NAME
         dbus.gobject_service.ExportedGObject.__init__(self, conn=dbus.SessionBus(),
@@ -34,16 +35,16 @@ class MouseTracker(dbus.gobject_service.ExportedGObject):
     def onMouseMove(self, x, y):
         raise NotImplementedError
 
-    @dbus.service.method("org.freedesktop.dbus.properties",
+    @dbus.service.method(PROPERTIES_IFACE,
 in_signature="",
 out_signature="{sv}")
-    def getAllProperties(self):
+    def getAll(self):
         dict = {}
         for prop in self.props:
             dict[prop.name] = self.get_property(prop.name)
         return dict
 
-    @dbus.service.method("org.freedesktop.dbus.properties",
+    @dbus.service.method(PROPERTIES_IFACE,
 in_signature="s",
 out_signature="v")
     def get(self, name):
@@ -52,7 +53,7 @@ out_signature="v")
         except TypeError, e:
             raise TrackerPropertyError(e.message)
 
-    @dbus.service.method("org.freedesktop.dbus.properties",
+    @dbus.service.method(PROPERTIES_IFACE,
     in_signature="sv",
     out_signature="")
     def set(self, property, value):
@@ -66,7 +67,7 @@ out_signature="v")
         value = self.get_property(name)
         self.propertyChanged(name, value)
 
-    @dbus.service.signal("mousetracker.tracker",
+    @dbus.service.signal(PROPERTIES_IFACE,
     signature="sv")
     def propertyChanged(self, name, value):
         return (name, value)
