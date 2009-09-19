@@ -1,1 +1,1 @@
-version = @PACKAGE_VERSION@
+version = "@PACKAGE_VERSION@"
