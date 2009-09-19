@@ -24,20 +24,17 @@ class TrackerPropertyException(dbus.DBusException):
     _dbus_error_name="mousetracker.tracker.TrackerPropertyException"
 
 class MouseTracker(dbus.gobject_service.ExportedGObject):
+    PROPERTIES_IFACE = "mousetracker.tracker.Properties"
 
-    PROPERTIES_IFACE = "mousetracker.Tracker.Properties"
     def __init__(self, **kwargs):
         from mousetracker import BUS_NAME
         dbus.gobject_service.ExportedGObject.__init__(self, conn=dbus.SessionBus(),
             bus_name=dbus.service.BusName(BUS_NAME, bus=dbus.SessionBus()), **kwargs)
         self.connect("notify", self._onPropertyChanged)
 
-    def onMouseMove(self, x, y):
-        raise NotImplementedError
-
     @dbus.service.method(PROPERTIES_IFACE,
-in_signature="",
-out_signature="{sv}")
+    in_signature="",
+    out_signature="a{sv}")
     def getAll(self):
         dict = {}
         for prop in self.props:
@@ -62,9 +59,9 @@ out_signature="v")
         except TypeError, e:
             raise TrackerPropertyError(e.message)
 
-    def _onPropertyChanged(self, spec, userdata=None):
+    def _onPropertyChanged(self, object, spec, userdata=None):
         name = spec.name
-        value = self.get_property(name)
+        value = get_property(name)
         self.propertyChanged(name, value)
 
     @dbus.service.signal(PROPERTIES_IFACE,
@@ -74,10 +71,10 @@ out_signature="v")
 
 class MousePositionTracker(MouseTracker):
     """ Mouse locator class to locate the mouse using sound """
-    _object_path = "/mousetracker/tracker/MousePositionTracker"
+    object_path = "/mousetracker/tracker/MousePositionTracker"
 
     def __init__(self, **kwargs):
-        MouseTracker.__init__(self, object_path=MousePositionTracker._object_path, **kwargs)
+        MouseTracker.__init__(self, object_path=MousePositionTracker.object_path, **kwargs)
         self._running = False
         
         # construct pipeline
