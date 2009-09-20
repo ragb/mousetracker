@@ -19,11 +19,15 @@ import dbus
 import dbus.service
 import dbus.gobject_service
 
+import logging
 
 class TrackerPropertyException(dbus.DBusException):
     _dbus_error_name="mousetracker.tracker.TrackerPropertyException"
 
 class MouseTracker(dbus.gobject_service.ExportedGObject):
+    _log = logging.getLogger("mousetracker.tracker")
+    _log.setLevel(logging.DEBUG)
+
     PROPERTIES_IFACE = "mousetracker.tracker.Properties"
 
     def __init__(self, **kwargs):
@@ -39,6 +43,7 @@ class MouseTracker(dbus.gobject_service.ExportedGObject):
         dict = {}
         for prop in self.props:
             dict[prop.name] = self.get_property(prop.name)
+        self._log.debug("getAll method called. Properties are %s" % str(dict))
         return dict
 
     @dbus.service.method(PROPERTIES_IFACE,
@@ -46,8 +51,10 @@ in_signature="s",
 out_signature="v")
     def get(self, name):
         try:
+            self._log.debug("Get %s=%s." %(name, value))
             return self.get_property(name)
         except TypeError, e:
+            self._log.exception(e)
             raise TrackerPropertyError(e.message)
 
     @dbus.service.method(PROPERTIES_IFACE,
@@ -55,18 +62,21 @@ out_signature="v")
     out_signature="")
     def set(self, property, value):
         try:
+            self._log.debug("Set %s=%s." %(name, value))
             self.set_property(property, value)
         except TypeError, e:
+            self._log.exception(e)
             raise TrackerPropertyError(e.message)
 
     def _onPropertyChanged(self, object, spec, userdata=None):
         name = spec.name
-        value = get_property(name)
+        value = self.get_property(name)
         self.propertyChanged(name, value)
 
     @dbus.service.signal(PROPERTIES_IFACE,
     signature="sv")
     def propertyChanged(self, name, value):
+        self._log.debug("Notifying of %s changing to %s" % (name, value))
         return (name, value)
 
 class MousePositionTracker(MouseTracker):
@@ -74,9 +84,8 @@ class MousePositionTracker(MouseTracker):
     object_path = "/mousetracker/tracker/MousePositionTracker"
 
     def __init__(self, **kwargs):
-        MouseTracker.__init__(self, object_path=MousePositionTracker.object_path, **kwargs)
         self._running = False
-        
+        MouseTracker.__init__(self, object_path=MousePositionTracker.object_path, **kwargs)
         # construct pipeline
         self._player = gst.Pipeline()
         self._source = gst.element_factory_make("audiotestsrc")
@@ -123,17 +132,34 @@ class MousePositionTracker(MouseTracker):
         maximum=500
         )
 
-    def run(self):
-        if self._running:
-            return
-        pyatspi.Registry.registerEventListener(self._onMouseMoved, "mouse:abs")
-        self._running = True
+    def _get_running(self):
+        try:
+            return self._running
+        except AttributeError:
+            return False
 
-    def stop(self):
-        if not self._running:
-            return
+    def _set_running(self, value):
+        if value != self._running: # if it is different
+            if value:
+                self._run()
+            else:
+                self._stop()
+            self._running = value
+
+    def _run(self):
+        pyatspi.Registry.registerEventListener(self._onMouseMoved, "mouse:abs")
+
+
+    def _stop(self):
         pyatspi.Registry.deregisterEventListener(self._onMouseMoved, "mouse:abs")
-        self._running = False
+
+
+    running = gobject.property(
+        type=bool,
+        nick='running',
+        default=False,
+        getter=_get_running,
+        setter=_set_running)
 
     def _onMouseMoved(self, event):
         x, y = event.detail1, event.detail2
