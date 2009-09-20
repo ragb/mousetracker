@@ -31,7 +31,7 @@ class MouseTracker(dbus.gobject_service.ExportedGObject):
     PROPERTIES_IFACE = "mousetracker.tracker.Properties"
 
     def __init__(self, **kwargs):
-        from mousetracker import BUS_NAME
+        from daemon import BUS_NAME
         dbus.gobject_service.ExportedGObject.__init__(self, conn=dbus.SessionBus(),
             bus_name=dbus.service.BusName(BUS_NAME, bus=dbus.SessionBus()), **kwargs)
         self.connect("notify", self._onPropertyChanged)
