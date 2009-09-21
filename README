@@ -3,6 +3,7 @@
 == Features ==
 
 * Tracks mouse using sound (pan for x coordenate, frequency for y coordenate)
+* Daemon can be controled via d-bus interface and uses d-bus activation
 * Writen in python
 * Uses gstreamer for sound output
 * uses gtk, gdk and pyatspi for capturing mouse events
@@ -14,6 +15,7 @@
 * pygtk 2.0
 * python gstreamer bindings (pygst) 0.10
 * pyatspi
+* dbus-python
 * python >= 2.4 and simplejson module or python >= 2.6
 
 

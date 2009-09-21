@@ -1,4 +1,3 @@
 * more ways to track the mouse (trackers)
 * GUI interface to control the application
-* d-bus interface to be controled by other applications
-
+* client interface to wrap the pure d-bus code
