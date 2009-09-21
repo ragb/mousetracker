@@ -16,9 +16,15 @@ AC_PROG_INSTALL
 dnl == check for python ==
 AM_PATH_PYTHON(2.4)
 
-dnl == check for gstreamer ==
+dnl == check for packages we found via pkg-config ==
 #PKG_CHECK_MODULES(MOUSETRACKER, gstreamer-0.10 gst-python-0.10 dbus-python)
 
+
+dnl check for python modules we need
+AM_CHECK_PYGTK(2.0)
+AM_CHECK_PYMOD(pyatspi)
+AM_CHECK_PYMOD(dbus)
+AM_CHECK_PYMOD(pygst)
 
 #dnl == i18n ==
 #GETTEXT_PACKAGE=mousetracker
@@ -33,7 +39,6 @@ dnl == generate makefiles ==
 AC_OUTPUT([
 Makefile
 data/Makefile
-data/mousetracker.daemon.service
 src/Makefile
 src/mousetracker/Makefile
 src/mousetracker/mousetracker
