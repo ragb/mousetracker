@@ -1,4 +1,4 @@
 [D-BUS Service]
 Name=mousetracker.daemon
-Exec=@bindir@/mousetracker
+Exec=@servicedir@/mousetracker
 
