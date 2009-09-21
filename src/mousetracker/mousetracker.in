@@ -1,3 +1,3 @@
 #! /bin/sh
 
-@PYTHON@ -c "import mousetracker; mousetracker.main()"
+@PYTHON@ -c "import mousetracker.Daemon; import sys; mousetracker.Daemon(sys.argv).main()"
