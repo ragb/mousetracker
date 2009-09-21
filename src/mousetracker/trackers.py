@@ -51,8 +51,9 @@ in_signature="s",
 out_signature="v")
     def get(self, name):
         try:
+            value = self.get_property(name)
             self._log.debug("Get %s=%s." %(name, value))
-            return self.get_property(name)
+            return value
         except TypeError, e:
             self._log.exception(e)
             raise TrackerPropertyError(e.message)
@@ -60,10 +61,10 @@ out_signature="v")
     @dbus.service.method(PROPERTIES_IFACE,
     in_signature="sv",
     out_signature="")
-    def set(self, property, value):
+    def set(self, name, value):
         try:
             self._log.debug("Set %s=%s." %(name, value))
-            self.set_property(property, value)
+            self.set_property(name, value)
         except TypeError, e:
             self._log.exception(e)
             raise TrackerPropertyError(e.message)
